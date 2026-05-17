@@ -109,7 +109,10 @@
   <div class="picker">
     <h2>Pick something for me.</h2>
     <p>Roll the dice. Random idea from whatever filter you have selected.</p>
-    <button class="btn btn-primary" id="random">Roll the dice →</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="random">Roll the dice →</button>
+      <button class="btn btn-ghost" id="for-tonight">For tonight ↗</button>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -425,6 +428,29 @@ document.getElementById('random').addEventListener('click', () => {
   const list = allIdeas().filter(matchesFilter);
   if (list.length === 0) return;
   const idea = list[Math.floor(Math.random() * list.length)];
+  showDetail(idea);
+});
+
+// For tonight — smart filter: cheap, time-appropriate, doable on short notice
+document.getElementById('for-tonight').addEventListener('click', () => {
+  const hour = new Date().getHours();
+  const isLate = hour >= 21 || hour < 6;
+  const isWeekday = ([1,2,3,4].includes(new Date().getDay())); // Mon-Thu
+  const candidates = allIdeas().filter(i => {
+    // Always cheap-friendly for spontaneous tonight ideas
+    if (i.cost === '$$$') return false;
+    // Late at night → bias toward late-night / chill / nearby
+    if (isLate) return ['Late Night', 'Chill', 'Weird', 'Food'].includes(i.category);
+    // Weeknight → no half-day adventures
+    if (isWeekday) return !['Adventure'].includes(i.category) || i.cost === 'free';
+    // Weekend daytime/evening: anything goes except $$$
+    return true;
+  });
+  if (candidates.length === 0) {
+    alert('Nothing matched tonight. Try the dice.');
+    return;
+  }
+  const idea = candidates[Math.floor(Math.random() * candidates.length)];
   showDetail(idea);
 });
 
