@@ -112,6 +112,8 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn btn-primary" id="random">Roll the dice →</button>
       <button class="btn btn-ghost" id="for-tonight">For tonight ↗</button>
+      <button class="btn btn-ghost" id="for-weekend">For this weekend ↗</button>
+      <button class="btn btn-ghost" id="for-cheap">Under $10 ↗</button>
     </div>
   </div>
 
@@ -429,6 +431,22 @@ document.getElementById('random').addEventListener('click', () => {
   if (list.length === 0) return;
   const idea = list[Math.floor(Math.random() * list.length)];
   showDetail(idea);
+});
+
+function pickSmart(predicate, label) {
+  const candidates = allIdeas().filter(predicate);
+  if (candidates.length === 0) { alert(`No ${label} ideas matched. Try the dice.`); return; }
+  const idea = candidates[Math.floor(Math.random() * candidates.length)];
+  showDetail(idea);
+}
+
+document.getElementById('for-weekend').addEventListener('click', () => {
+  // Weekend = bigger experiences welcome, all costs except $$$ if you want it
+  pickSmart(i => true, 'weekend');
+});
+
+document.getElementById('for-cheap').addEventListener('click', () => {
+  pickSmart(i => i.cost === 'free' || i.cost === '$', 'under-$10');
 });
 
 // For tonight — smart filter: cheap, time-appropriate, doable on short notice
