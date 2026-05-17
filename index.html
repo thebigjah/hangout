@@ -146,8 +146,10 @@
     <p class="card-meta" id="d-meta"></p>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="d-share">Share</button>
+      <button class="btn btn-ghost" id="d-hide" style="display:none;">Hide</button>
       <button class="btn btn-ghost" id="d-delete" style="display:none;">Delete</button>
-      <button class="btn btn-primary" id="d-close">Close</button>
+      <button class="btn btn-primary" id="d-mark-done">I did this!</button>
+      <button class="btn btn-ghost" id="d-close">Close</button>
     </div>
   </div>
 </div>
@@ -178,13 +180,17 @@ const SEEDS = [
 
 const KEY = 'hangout.user.v1';
 const HIDDEN_KEY = 'hangout.hidden.v1';
+const DONE_KEY = 'hangout.done.v1';   // { ideaId: [{ ts, note, with }] }
 function loadUser() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
 function saveUser(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); }
 function loadHidden() { try { return JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]'); } catch { return []; } }
 function saveHidden(arr) { localStorage.setItem(HIDDEN_KEY, JSON.stringify(arr)); }
+function loadDone() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '{}'); } catch { return {}; } }
+function saveDone(obj) { localStorage.setItem(DONE_KEY, JSON.stringify(obj)); }
 
 let userIdeas = loadUser();
 let hiddenSeeds = loadHidden();
+let doneLog = loadDone();
 let activeFilter = 'All';
 let searchTerm = '';
 
@@ -232,8 +238,12 @@ function renderGrid() {
   list.forEach(idea => {
     const card = document.createElement('div');
     card.className = 'card' + (idea.source === 'user' ? ' user' : '');
+    const doneCount = (doneLog[idea.id] || []).length;
+    const doneBadge = doneCount > 0
+      ? `<span style="display:inline-block;font-size:10px;letter-spacing:.12em;color:var(--accent-bright);background:rgba(232,185,104,0.12);border:1px solid var(--accent-bright);border-radius:999px;padding:2px 8px;margin-left:6px;">DONE ×${doneCount}</span>`
+      : '';
     card.innerHTML = `
-      <span class="card-tag">${escapeHtml(idea.category)} · ${escapeHtml(idea.cost)}</span>
+      <span class="card-tag">${escapeHtml(idea.category)} · ${escapeHtml(idea.cost)}${doneBadge}</span>
       <h3 class="card-title">${escapeHtml(idea.title)}</h3>
       <p class="card-desc">${escapeHtml(idea.desc)}</p>
       <p class="card-meta">
@@ -244,6 +254,40 @@ function renderGrid() {
     card.addEventListener('click', () => showDetail(idea));
     g.appendChild(card);
   });
+  renderDoneJournal();
+}
+
+function renderDoneJournal() {
+  let journalEl = document.getElementById('done-journal');
+  if (!journalEl) {
+    journalEl = document.createElement('div');
+    journalEl.id = 'done-journal';
+    journalEl.style.marginTop = '36px';
+    document.querySelector('main.wrap').insertBefore(journalEl, document.querySelector('p.footer'));
+  }
+  const entries = [];
+  Object.entries(doneLog).forEach(([ideaId, logs]) => {
+    const idea = allIdeas().find(i => i.id === ideaId);
+    if (!idea) return;
+    logs.forEach(l => entries.push({ idea, log: l }));
+  });
+  entries.sort((a, b) => b.log.ts - a.log.ts);
+  if (entries.length === 0) { journalEl.innerHTML = ''; return; }
+  journalEl.innerHTML = `
+    <h2 class="serif" style="font-family:'Cinzel',Georgia,serif;font-size:24px;color:var(--text);margin:0 0 16px;">
+      Done <span style="color:var(--text-light);font-size:14px;font-family:Inter,sans-serif;">— ${entries.length} hangout${entries.length===1?'':'s'} you actually did</span>
+    </h2>
+    <div style="display:grid;gap:8px;">
+      ${entries.slice(0, 30).map((e, i) => `
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:14px;color:var(--text);font-weight:600;">${escapeHtml(e.idea.title)}</div>
+            <div style="font-size:12px;color:var(--text-light);">${new Date(e.log.ts).toLocaleDateString()}${e.log.with ? ` · with ${escapeHtml(e.log.with)}` : ''}${e.log.note ? ` · "${escapeHtml(e.log.note)}"` : ''}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 function render() { renderFilters(); renderGrid(); }
@@ -293,11 +337,13 @@ const dModal = document.getElementById('modal-detail');
 let currentIdea = null;
 function showDetail(idea) {
   currentIdea = idea;
-  document.getElementById('d-tag').textContent = `${idea.category} · ${idea.cost}`;
+  const doneCount = (doneLog[idea.id] || []).length;
+  document.getElementById('d-tag').textContent = `${idea.category} · ${idea.cost}${doneCount ? ` · done ×${doneCount}` : ''}`;
   document.getElementById('d-title').textContent = idea.title;
   document.getElementById('d-desc').textContent = idea.desc;
   document.getElementById('d-meta').innerHTML = `<span>📍 ${escapeHtml(idea.where)}</span>${idea.vibe ? ` <span>· ${escapeHtml(idea.vibe)}</span>` : ''}`;
   document.getElementById('d-delete').style.display = idea.source === 'user' ? 'inline-block' : 'none';
+  document.getElementById('d-hide').style.display = idea.source === 'seed' ? 'inline-block' : 'none';
   dModal.classList.add('show');
 }
 document.getElementById('d-close').addEventListener('click', () => dModal.classList.remove('show'));
@@ -317,6 +363,24 @@ document.getElementById('d-delete').addEventListener('click', () => {
   if (!confirm('Delete this idea?')) return;
   userIdeas = userIdeas.filter(u => u.id !== currentIdea.id);
   saveUser(userIdeas);
+  dModal.classList.remove('show');
+  render();
+});
+document.getElementById('d-hide').addEventListener('click', () => {
+  if (!currentIdea || currentIdea.source !== 'seed') return;
+  if (!hiddenSeeds.includes(currentIdea.id)) hiddenSeeds.push(currentIdea.id);
+  saveHidden(hiddenSeeds);
+  dModal.classList.remove('show');
+  render();
+});
+document.getElementById('d-mark-done').addEventListener('click', () => {
+  if (!currentIdea) return;
+  const w = prompt('Who were you with? (optional)') || '';
+  const note = prompt('Any note about how it went? (optional)') || '';
+  const log = { ts: Date.now(), with: w.trim(), note: note.trim() };
+  doneLog[currentIdea.id] = doneLog[currentIdea.id] || [];
+  doneLog[currentIdea.id].push(log);
+  saveDone(doneLog);
   dModal.classList.remove('show');
   render();
 });
