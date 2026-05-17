@@ -97,6 +97,7 @@
   <div class="toolbar">
     <div class="filters" id="filters"></div>
     <input class="search" id="search" type="text" placeholder="search…">
+    <button class="btn btn-ghost" id="share-list" title="Share your custom-added ideas as a link">Share my list</button>
     <button class="btn btn-primary" id="open-add">+ Add your own</button>
   </div>
 
@@ -193,6 +194,29 @@ let hiddenSeeds = loadHidden();
 let doneLog = loadDone();
 let activeFilter = 'All';
 let searchTerm = '';
+
+// On load: if URL has #list=<base64>, offer to import
+(function checkUrlImport() {
+  const m = location.hash.match(/^#list=(.+)/);
+  if (!m) return;
+  try {
+    const decoded = decodeURIComponent(escape(atob(m[1])));
+    const incoming = JSON.parse(decoded);
+    if (!Array.isArray(incoming)) return;
+    const ok = confirm(`Someone shared ${incoming.length} hangout idea${incoming.length===1?'':'s'} with you. Add them to your list?`);
+    if (ok) {
+      // Re-id incoming ideas to avoid collisions
+      const reIdded = incoming.map(idea => ({ ...idea, id: 'u_shared_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6) }));
+      userIdeas = [...reIdded, ...userIdeas];
+      saveUser(userIdeas);
+      alert(`Added ${incoming.length} ideas.`);
+    }
+    // Clear hash either way
+    history.replaceState(null, '', location.pathname);
+  } catch (e) {
+    console.warn('shared list parse failed', e);
+  }
+})();
 
 const CATEGORIES = ['All','Outdoors','Food','Adventure','Chill','Cheap/Free','Creative','Late Night','Weird','Date','Group'];
 
@@ -292,6 +316,28 @@ function renderDoneJournal() {
 
 function render() { renderFilters(); renderGrid(); }
 function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+// Share my list — encodes userIdeas as base64 into the URL hash
+document.getElementById('share-list').addEventListener('click', async () => {
+  if (userIdeas.length === 0) {
+    alert('You haven\\'t added any custom ideas yet. Use "+ Add your own" first.');
+    return;
+  }
+  // Only share the *content* — strip ids since recipient will re-id on import
+  const stripped = userIdeas.map(({ id: _id, ...rest }) => rest);
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(stripped))));
+  const url = `${location.origin}${location.pathname}#list=${encoded}`;
+  const text = `Here are ${userIdeas.length} hangout ideas from my list:\\n\\n${userIdeas.slice(0, 6).map(i => '• ' + i.title).join('\\n')}${userIdeas.length > 6 ? `\\n  …and ${userIdeas.length - 6} more` : ''}\\n\\nTap to add them to your own:\\n${url}`;
+  if (navigator.share) {
+    try { await navigator.share({ text, url }); return; } catch {}
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    alert(`Link copied. Paste it anywhere — they\\'ll get all ${userIdeas.length} ideas when they open it.`);
+  } catch {
+    prompt('Copy this link:', url);
+  }
+});
 
 // Random
 document.getElementById('random').addEventListener('click', () => {
