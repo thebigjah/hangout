@@ -13,101 +13,351 @@
 <meta name="theme-color" content="#0a0604">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Lexend:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+<meta name="theme-color" content="#fef8e7">
 <style>
+/*  ============================================================
+    HANGOUT · risograph sticker pack
+    -----------------------------------------------------------
+    Theme: a printed zine / sticker-pack aesthetic. Bright cream
+    paper. Multiple bold colors used unabashedly. Cards LOOK like
+    stickers — slight rotation, drop-shadow, color outlines.
+    Categorically opposite from everything else: PLAYFUL.
+    No serif, no italic, no muted palette, no double-rules.
+    ============================================================ */
+
   :root {
-    --bg: #0a0604;
-    --bg-2: #16110b;
-    --card: #1b1510;
-    --border: #2e2820;
-    --border-light: #3a342a;
-    --text: #f5f0e0;
-    --text-muted: #b6a98e;
-    --text-light: #847b69;
-    --accent: #c2a173;
-    --accent-bright: #e8b968;
+    --paper:#fef8e7;
+    --paper-deep:#f4ecc8;
+    --paper-shade:#e8dba0;
+    --ink:#1a1a1a;
+    --ink-soft:#4a4a48;
+    --ink-faint:#8a8780;
+    --tomato:#ee5e3a;
+    --tomato-deep:#c44022;
+    --sky:#4a8fce;
+    --sky-deep:#2a6caa;
+    --sun:#f7c948;
+    --sun-deep:#d8a830;
+    --leaf:#5a9b3a;
+    --leaf-deep:#3e7825;
+    --grape:#8b5fbf;
+    --pink:#e85a8a;
+    --rule:rgba(26, 26, 26, 0.14);
+
+    --display:'Space Grotesk', system-ui, sans-serif;
+    --body:'Lexend', system-ui, sans-serif;
+    --mono:'DM Mono', ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
-  .serif { font-family: 'Cinzel', Georgia, serif; }
-  .kicker { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
-  h1.title { font-family: 'Cinzel', Georgia, serif; font-size: clamp(40px, 6vw, 64px); font-weight: 700; margin: 0 0 12px; line-height: 1.04; }
-  p.lead { font-size: 18px; color: var(--text-muted); margin: 0 0 32px; max-width: 580px; line-height: 1.6; }
-  .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 22px; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Riso-print grain */
+  body::before {
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/></svg>");
+    opacity:0.10;mix-blend-mode:multiply;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 80px; position:relative; z-index:2; }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 500;
+    letter-spacing: .22em; text-transform: uppercase;
+    color: var(--tomato);
+    margin: 0 0 16px;
+    display:inline-block;
+    background: var(--paper-deep);
+    padding: 5px 10px;
+    border: 1.5px solid var(--tomato);
+    transform: rotate(-1.5deg);
+  }
+  h1.title {
+    font-family: var(--display);
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 700;
+    margin: 0 0 14px;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  h1.title::after {
+    content:"!"; color:var(--tomato);
+  }
+  p.lead {
+    font-family: var(--body);
+    font-size: 19px; font-weight: 400;
+    color: var(--ink-soft);
+    margin: 0 0 36px;
+    max-width: 560px;
+    line-height: 1.5;
+  }
+
+  /* DICE PICKER — the loud centerpiece */
+  .picker {
+    background: var(--sun);
+    border: 3px solid var(--ink);
+    border-radius: 0;
+    padding: 26px 28px;
+    margin-bottom: 36px;
+    position: relative;
+    box-shadow: 8px 8px 0 var(--ink);
+    transform: rotate(-0.4deg);
+  }
+  .picker h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .picker p {
+    font-family: var(--body);
+    color: var(--ink); font-weight: 500;
+    font-size: 15px; margin: 0 0 20px;
+  }
+
+  .btn {
+    appearance: none; border: none; cursor: pointer;
+    padding: 12px 22px;
+    border-radius: 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    transition: transform 80ms, box-shadow 80ms;
+    background: var(--ink);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+  .btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+  .btn-primary { background: var(--tomato); color: var(--paper); border-color: var(--ink); }
+  .btn-ghost { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+
+  .toolbar {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 26px;
+    padding: 16px 18px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
   .filters { display: flex; gap: 6px; flex-wrap: wrap; }
   .chip {
-    padding: 6px 14px; border-radius: 999px;
-    background: transparent; border: 1px solid var(--border-light);
-    color: var(--text-muted); font-size: 13px; cursor: pointer;
-    transition: all 120ms;
-    font-family: inherit;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    color: var(--ink); font-size: 12.5px;
+    font-family: var(--display); font-weight: 600;
+    cursor: pointer;
+    transition: all 100ms;
+    letter-spacing: 0.01em;
   }
-  .chip.on { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
-  .chip:hover { border-color: var(--accent); }
+  .chip:hover { transform: translateY(-1px); }
+  /* Category-specific chip colors when active */
+  .chip.on { background: var(--ink); color: var(--paper); }
+  .chip.on[data-cat="Outdoors"] { background: var(--leaf); color: var(--paper); }
+  .chip.on[data-cat="Food"] { background: var(--tomato); color: var(--paper); }
+  .chip.on[data-cat="Adventure"] { background: var(--sky); color: var(--paper); }
+  .chip.on[data-cat="Chill"] { background: var(--grape); color: var(--paper); }
+  .chip.on[data-cat="Cheap/Free"] { background: var(--sun-deep); color: var(--ink); }
+  .chip.on[data-cat="Creative"] { background: var(--pink); color: var(--paper); }
+  .chip.on[data-cat="Late Night"] { background: var(--sky-deep); color: var(--paper); }
+  .chip.on[data-cat="Weird"] { background: var(--grape); color: var(--paper); }
+  .chip.on[data-cat="Date"] { background: var(--pink); color: var(--paper); }
+  .chip.on[data-cat="Group"] { background: var(--leaf-deep); color: var(--paper); }
+
   .search {
     margin-left: auto; flex: 1; min-width: 200px;
-    padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px;
-    background: var(--bg-2); color: var(--text); font-size: 14px; outline: none; font-family: inherit;
+    padding: 9px 14px;
+    border: 1.5px solid var(--ink); border-radius: 999px;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--body); font-size: 14px; outline: none;
   }
-  .search:focus { border-color: var(--accent); }
-  .btn { appearance: none; border: none; cursor: pointer; padding: 10px 20px; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: .04em; transition: transform 80ms; }
-  .btn:active { transform: translateY(1px) scale(.99); }
-  .btn-primary { background: var(--accent); color: var(--bg); }
-  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-light); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 120ms, transform 120ms; cursor: pointer; }
-  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .card-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
-  .card-title { font-family: 'Cinzel', Georgia, serif; font-size: 19px; color: var(--text); margin: 0 0 10px; line-height: 1.25; }
-  .card-desc { font-size: 14px; color: var(--text-muted); line-height: 1.55; margin: 0 0 14px; }
-  .card-meta { font-size: 12px; color: var(--text-light); display: flex; gap: 12px; flex-wrap: wrap; }
+  .search:focus { border-color: var(--tomato); }
+  .search::placeholder { color: var(--ink-faint); }
+
+  .view-toggle {
+    display: inline-flex;
+    border: 1.5px solid var(--ink); border-radius: 0;
+    overflow: hidden;
+    margin-right: 4px;
+  }
+  .view-toggle button {
+    background: var(--paper); border: none;
+    padding: 7px 14px; color: var(--ink); cursor: pointer;
+    font-family: var(--display); font-weight: 600;
+    font-size: 12.5px; letter-spacing: 0.02em;
+  }
+  .view-toggle button.on { background: var(--ink); color: var(--paper); }
+
+  /* CARDS — sticker style */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 0;
+    padding: 18px 20px 16px;
+    transition: transform 120ms, box-shadow 120ms;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .card:hover { transform: translate(-3px, -3px); box-shadow: 8px 8px 0 var(--ink); }
+  /* Subtle rotation alternation between cards */
+  .card:nth-child(3n+1) { transform: rotate(-0.4deg); }
+  .card:nth-child(3n+2) { transform: rotate(0.6deg); }
+  .card:nth-child(3n+3) { transform: rotate(-0.2deg); }
+  .card:nth-child(3n+1):hover { transform: rotate(-0.4deg) translate(-3px, -3px); }
+  .card:nth-child(3n+2):hover { transform: rotate(0.6deg) translate(-3px, -3px); }
+  .card:nth-child(3n+3):hover { transform: rotate(-0.2deg) translate(-3px, -3px); }
+
+  .card-tag {
+    display: inline-block;
+    font-family: var(--display);
+    font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 4px 10px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .card-tag[data-cat="Outdoors"] { background: var(--leaf); }
+  .card-tag[data-cat="Food"] { background: var(--tomato); }
+  .card-tag[data-cat="Adventure"] { background: var(--sky); }
+  .card-tag[data-cat="Chill"] { background: var(--grape); }
+  .card-tag[data-cat="Cheap/Free"] { background: var(--sun-deep); color: var(--ink); }
+  .card-tag[data-cat="Creative"] { background: var(--pink); }
+  .card-tag[data-cat="Late Night"] { background: var(--sky-deep); }
+  .card-tag[data-cat="Weird"] { background: var(--grape); }
+  .card-tag[data-cat="Date"] { background: var(--pink); }
+  .card-tag[data-cat="Group"] { background: var(--leaf-deep); }
+
+  .card-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--ink);
+    margin: 0 0 10px;
+    line-height: 1.2;
+    letter-spacing: -0.005em;
+  }
+  .card-desc {
+    font-family: var(--body);
+    font-size: 14px; font-weight: 400;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin: 0 0 14px;
+  }
+  .card-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    display: flex; gap: 12px;
+    flex-wrap: wrap;
+    border-top: 1px dashed var(--rule);
+    padding-top: 10px;
+  }
   .card-meta span { display: inline-flex; gap: 4px; align-items: center; }
-  .card.user { border-color: var(--accent-bright); }
-  .empty { text-align: center; padding: 40px 24px; color: var(--text-light); font-size: 15px; }
-  .view-toggle { display: inline-flex; border: 1px solid var(--border-light); border-radius: 6px; overflow: hidden; margin-right: 8px; }
-  .view-toggle button { background: transparent; border: none; padding: 8px 14px; color: var(--text-muted); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; }
-  .view-toggle button.on { background: var(--accent); color: var(--bg); }
-  #map-view { display: none; height: 480px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 18px; overflow: hidden; }
+  .card.user { border-color: var(--tomato); }
+  .card.user::after {
+    content:"YOURS";
+    position:absolute; top:-12px; right:14px;
+    font-family: var(--mono); font-size: 9.5px;
+    font-weight: 500; letter-spacing: 0.16em;
+    background: var(--tomato); color: var(--paper);
+    padding: 3px 8px;
+    transform: rotate(3deg);
+  }
+
+  .empty {
+    text-align: center; padding: 48px 24px;
+    color: var(--ink-soft); font-size: 15px;
+    font-family: var(--body); font-style: italic;
+  }
+
+  /* MAP */
+  #map-view { display: none; height: 480px; border-radius: 0; border: 2.5px solid var(--ink); margin-bottom: 26px; overflow: hidden; box-shadow: 5px 5px 0 var(--ink); }
   #map-view.show { display: block; }
   #grid.hidden { display: none; }
-  .leaflet-container { background: #14110b !important; }
-  .leaflet-tile { filter: brightness(0.7) saturate(0.85); }
-  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--card); color: var(--text); border: 1px solid var(--border-light); }
-  .leaflet-popup-content { color: var(--text); margin: 12px 14px; font-family: Inter, sans-serif; font-size: 13px; line-height: 1.5; }
-  .leaflet-popup-content strong { color: var(--accent); }
-  .leaflet-control-zoom a { background: var(--card) !important; color: var(--accent) !important; border-color: var(--border) !important; }
-  .leaflet-control-attribution { background: rgba(10,6,4,0.7) !important; color: var(--text-light) !important; }
-  .leaflet-control-attribution a { color: var(--accent) !important; }
-  .picker { background: var(--bg-2); border: 1px solid var(--border-light); border-radius: 12px; padding: 24px; margin-bottom: 28px; }
-  .picker h2 { font-family: 'Cinzel', Georgia, serif; font-size: 20px; margin: 0 0 12px; color: var(--text); }
-  .picker p { color: var(--text-muted); font-size: 14px; margin: 0 0 16px; }
-  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+  .leaflet-container { background: var(--paper-deep) !important; }
+  .leaflet-tile { filter: contrast(1.05) saturate(0.9); }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); border-radius: 0; }
+  .leaflet-popup-content { color: var(--ink); margin: 10px 14px; font-family: var(--body); font-size: 13.5px; line-height: 1.5; }
+  .leaflet-popup-content strong { color: var(--tomato); }
+  .leaflet-control-zoom a { background: var(--paper) !important; color: var(--ink) !important; border-color: var(--ink) !important; }
+  .leaflet-control-attribution { background: rgba(254, 248, 231, 0.85) !important; color: var(--ink-soft) !important; }
+  .leaflet-control-attribution a { color: var(--tomato) !important; }
+
+  /* MODALS */
+  .modal-bg { position: fixed; inset: 0; background: rgba(26, 26, 26, 0.55); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
   .modal-bg.show { display: flex; }
-  .modal { background: var(--bg-2); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
-  .modal h3 { font-family: 'Cinzel', Georgia, serif; font-size: 22px; margin: 0 0 18px; color: var(--text); }
-  .modal label { display: block; font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px; margin-top: 14px; }
-  .modal input, .modal textarea, .modal select {
-    width: 100%; padding: 11px 14px; background: var(--card); color: var(--text);
-    border: 1px solid var(--border-light); border-radius: 8px;
-    font-family: inherit; font-size: 14px; outline: none;
+  .modal {
+    background: var(--paper);
+    border: 3px solid var(--ink); border-radius: 0;
+    padding: 32px;
+    max-width: 540px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 8px 8px 0 var(--ink);
   }
-  .modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--accent); }
-  .modal textarea { min-height: 80px; resize: vertical; }
-  .detail-modal .card-title { font-size: 26px; }
+  .modal h3 {
+    font-family: var(--display); font-weight: 700;
+    font-size: 26px; margin: 0 0 20px;
+    color: var(--ink); letter-spacing: -0.01em;
+  }
+  .modal label {
+    display: block; font-family: var(--mono); font-size: 10.5px;
+    font-weight: 500; color: var(--ink); text-transform: uppercase;
+    letter-spacing: 0.18em; margin-bottom: 6px; margin-top: 16px;
+  }
+  .modal input, .modal textarea, .modal select {
+    width: 100%; padding: 10px 14px;
+    background: var(--paper); color: var(--ink);
+    border: 2px solid var(--ink); border-radius: 0;
+    font-family: var(--body); font-size: 15px; outline: none;
+  }
+  .modal input:focus, .modal textarea:focus, .modal select:focus { border-color: var(--tomato); }
+  .modal textarea { min-height: 88px; resize: vertical; }
+  .detail-modal .card-title { font-size: 30px; }
   .detail-modal .card-desc { font-size: 16px; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }
-  .footer { font-size: 13px; color: var(--text-light); text-align: center; margin-top: 50px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; flex-wrap: wrap; }
+
+  .footer {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--ink-soft); text-align: center;
+    margin-top: 60px; padding-top: 22px;
+    border-top: 2px dashed var(--ink);
+    letter-spacing: 0.04em;
+  }
+  .credit {
+    font-family: var(--display); font-weight: 600;
+    font-size: 9.5px; letter-spacing: 0.4em;
+    color: var(--ink-faint); margin-top: 14px;
+  }
 </style>
 </head>
 <body>
 <main class="wrap">
-  <p class="kicker">A list of ideas you can actually go do</p>
-  <h1 class="title">Steal My Hangout.</h1>
+  <p class="kicker">Ideas you can actually go do</p>
+  <h1 class="title">Steal my hangout</h1>
   <p class="lead">
     Better than scrolling for 20 minutes asking each other what to do. Pick one. Go.
   </p>
@@ -137,7 +387,8 @@
   <div id="map-view"></div>
   <div class="grid" id="grid"></div>
 
-  <p class="footer">Steal My Hangout v0.1 · saves locally · pre-seeded with Atlanta-area ideas · add your own to grow the list</p>
+  <p class="footer">Steal My Hangout v0.1 · saves locally · pre-seeded with Atlanta-area ideas · add your own to grow the list
+  <div class="credit">— PURCELLVENTURES.CO —</div></p>
 </main>
 
 <!-- ADD MODAL -->
@@ -279,6 +530,7 @@ function renderFilters() {
   CATEGORIES.forEach(c => {
     const b = document.createElement('button');
     b.className = 'chip' + (activeFilter === c ? ' on' : '');
+    b.setAttribute('data-cat', c);
     b.textContent = c;
     b.addEventListener('click', () => { activeFilter = c; render(); });
     f.appendChild(b);
@@ -298,10 +550,10 @@ function renderGrid() {
     card.className = 'card' + (idea.source === 'user' ? ' user' : '');
     const doneCount = (doneLog[idea.id] || []).length;
     const doneBadge = doneCount > 0
-      ? `<span style="display:inline-block;font-size:10px;letter-spacing:.12em;color:var(--accent-bright);background:rgba(232,185,104,0.12);border:1px solid var(--accent-bright);border-radius:999px;padding:2px 8px;margin-left:6px;">DONE ×${doneCount}</span>`
+      ? `<span style="display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--ink);background:var(--sun);border:1.5px solid var(--ink);padding:2px 8px;margin-left:6px;">DONE ×${doneCount}</span>`
       : '';
     card.innerHTML = `
-      <span class="card-tag">${escapeHtml(idea.category)} · ${escapeHtml(idea.cost)}${doneBadge}</span>
+      <span class="card-tag" data-cat="${escapeHtml(idea.category)}">${escapeHtml(idea.category)} · ${escapeHtml(idea.cost)}${doneBadge}</span>
       <h3 class="card-title">${escapeHtml(idea.title)}</h3>
       <p class="card-desc">${escapeHtml(idea.desc)}</p>
       <p class="card-meta">
