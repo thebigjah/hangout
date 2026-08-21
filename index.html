@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Steal My Hangout, better than scrolling | Elijah Purcell</title>
 <meta name="description" content="Actually-good hangout ideas other people have really done. Browse, pick one, submit your own. By Elijah Purcell, Purcell Ventures LLC.">
-<meta property="og:title" content="Steal My Hangout — better than scrolling for 20 minutes">
+<meta property="og:title" content="Steal My Hangout, better than scrolling for 20 minutes">
 <meta property="og:description" content="Actually-good hangout ideas other people have really done. Browse, pick one, submit your own. By Elijah Purcell, Purcell Ventures LLC.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://thebigjah.github.io/hangout/">
@@ -25,7 +25,7 @@
     -----------------------------------------------------------
     Theme: a printed zine / sticker-pack aesthetic. Bright cream
     paper. Multiple bold colors used unabashedly. Cards LOOK like
-    stickers — slight rotation, drop-shadow, color outlines.
+    stickers, slight rotation, drop-shadow, color outlines.
     Categorically opposite from everything else: PLAYFUL.
     No serif, no italic, no muted palette, no double-rules.
     ============================================================ */
@@ -102,7 +102,7 @@
     line-height: 1.5;
   }
 
-  /* DICE PICKER — the loud centerpiece */
+  /* DICE PICKER, the loud centerpiece */
   .picker {
     background: var(--sun);
     border: 3px solid var(--ink);
@@ -204,7 +204,7 @@
   }
   .view-toggle button.on { background: var(--ink); color: var(--paper); }
 
-  /* CARDS — sticker style */
+  /* CARDS, sticker style */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -390,7 +390,7 @@
   <div class="grid" id="grid"></div>
 
   <p class="footer">Steal My Hangout v0.1 · saves locally · pre-seeded with Atlanta-area ideas · add your own to grow the list
-  <div class="credit">— PURCELLVENTURES.CO —</div></p>
+  <div class="credit">, PURCELLVENTURES.CO,</div></p>
 </main>
 
 <!-- ADD MODAL -->
@@ -587,7 +587,7 @@ function renderDoneJournal() {
   if (entries.length === 0) { journalEl.innerHTML = ''; return; }
   journalEl.innerHTML = `
     <h2 class="serif" style="font-family:'Cinzel',Georgia,serif;font-size:24px;color:var(--text);margin:0 0 16px;">
-      Done <span style="color:var(--text-light);font-size:14px;font-family:Inter,sans-serif;">— ${entries.length} hangout${entries.length===1?'':'s'} you actually did</span>
+      Done <span style="color:var(--text-light);font-size:14px;font-family:Inter,sans-serif;">, ${entries.length} hangout${entries.length===1?'':'s'} you actually did</span>
     </h2>
     <div style="display:grid;gap:8px;">
       ${entries.slice(0, 30).map((e, i) => `
@@ -663,13 +663,13 @@ document.getElementById('view-map').addEventListener('click', () => {
   renderMap();
 });
 
-// Share my list — encodes userIdeas as base64 into the URL hash
+// Share my list, encodes userIdeas as base64 into the URL hash
 document.getElementById('share-list').addEventListener('click', async () => {
   if (userIdeas.length === 0) {
     alert('You haven\\'t added any custom ideas yet. Use "+ Add your own" first.');
     return;
   }
-  // Only share the *content* — strip ids since recipient will re-id on import
+  // Only share the *content*, strip ids since recipient will re-id on import
   const stripped = userIdeas.map(({ id: _id, ...rest }) => rest);
   const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(stripped))));
   const url = `${location.origin}${location.pathname}#list=${encoded}`;
@@ -679,7 +679,7 @@ document.getElementById('share-list').addEventListener('click', async () => {
   }
   try {
     await navigator.clipboard.writeText(url);
-    alert(`Link copied. Paste it anywhere — they\\'ll get all ${userIdeas.length} ideas when they open it.`);
+    alert(`Link copied. Paste it anywhere, they\\'ll get all ${userIdeas.length} ideas when they open it.`);
   } catch {
     prompt('Copy this link:', url);
   }
@@ -709,7 +709,7 @@ document.getElementById('for-cheap').addEventListener('click', () => {
   pickSmart(i => i.cost === 'free' || i.cost === '$', 'under-$10');
 });
 
-// For tonight — smart filter: cheap, time-appropriate, doable on short notice
+// For tonight, smart filter: cheap, time-appropriate, doable on short notice
 document.getElementById('for-tonight').addEventListener('click', () => {
   const hour = new Date().getHours();
   const isLate = hour >= 21 || hour < 6;
